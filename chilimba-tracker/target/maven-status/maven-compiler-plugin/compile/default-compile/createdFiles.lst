@@ -1,0 +1,11 @@
+zm/zut/Main$NewUserRequest.class
+zm/zut/Contribution.class
+zm/zut/OrdinaryMember.class
+zm/zut/Payout.class
+zm/zut/Treasurer.class
+zm/zut/SavingsGroup.class
+zm/zut/MissedContributionException.class
+zm/zut/RotationPayout.class
+zm/zut/PayoutRule.class
+zm/zut/User.class
+zm/zut/Main.class
