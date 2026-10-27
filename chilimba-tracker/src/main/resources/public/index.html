@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chilimba Tracker Admin</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="top-nav">
+        <div class="nav-brand">CHILIMBA LEDGER</div>
+        <div class="status">System: <span class="status-indicator">ONLINE</span></div>
+    </header>
+
+    <main class="dashboard-grid">
+        <section class="panel form-panel">
+            <h2>Add Member</h2>
+            <form id="member-form">
+                <input type="text" id="member-id" placeholder="Student ID (e.g. 2410123)" required>
+                <input type="text" id="member-name" placeholder="Full Name" required>
+                <input type="tel" id="member-phone" placeholder="Phone Number" required>
+                <select id="member-role">
+                    <option value="OrdinaryMember">Ordinary Member</option>
+                    <option value="Treasurer">Treasurer</option>
+                </select>
+                <button type="submit" class="btn-primary">Register</button>
+            </form>
+        </section>
+
+        <section class="panel form-panel">
+            <h2>Log Contribution</h2>
+            <form id="contribution-form">
+                <input type="text" id="contrib-member-id" placeholder="Student ID" required>
+                <input type="number" id="contrib-amount" placeholder="Amount (ZMW)" min="1" required>
+                <button type="submit" class="btn-primary">Record Payment</button>
+            </form>
+        </section>
+
+        <section class="panel form-panel">
+            <h2>System Controls</h2>
+            <div class="control-group">
+                <p>Trigger the payout algorithm for the current cycle.</p>
+                <button id="trigger-payout-btn" class="btn-warning">Execute Payout (5000 ZMW)</button>
+            </div>
+        </section>
+
+        <section class="panel data-panel full-width">
+            <h2>Ledger Data</h2>
+            <div class="table-container">
+                <table id="ledger-table">
+                    <thead>
+                        <tr>
+                            <th>TIMESTAMP</th>
+                            <th>TYPE</th>
+                            <th>MEMBER ID</th>
+                            <th>AMOUNT (ZMW)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ledger-body">
+                        <!-- Data injected via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+    <script src="app.js"></script>
+</body>
+</html>
