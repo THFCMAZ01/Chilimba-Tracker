@@ -1,0 +1,1 @@
+web: mvn clean package && java -jar target/chilimba-tracker-1.0-SNAPSHOT.jar
