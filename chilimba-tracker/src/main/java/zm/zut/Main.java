@@ -49,4 +49,5 @@ public class Main {
             ctx.status(201).json(newUser);
         });
     }
-}
+}  
+
