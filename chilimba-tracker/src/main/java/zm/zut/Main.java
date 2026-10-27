@@ -79,6 +79,7 @@ public class Main {
         });
 
         // Start server after configuring routes and static files
-        app.start(7070);
+        int port = System.getenv("PORT") != null ? Integer.parseInt(System.getenv("PORT")) : 7070;
+        app.start(port);
     }
 }
