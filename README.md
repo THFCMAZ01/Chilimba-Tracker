@@ -7,3 +7,13 @@ Server configuration
 
 # Chilimba Tracker Application Properties
 server.port=7070 app.env=production app.name=ChilimbaTrackerAPI # Database Configuration (Pending Migration from HashMaps) db.url=jdbc:postgresql://localhost:5432/chilimba_db db.username=admin db.password=placeholder_password db.driver=org.postgresql.Driver
+
+Commit workflow
+
+git checkout main
+git pull origin main
+git checkout -b docs/gabriel-readme-config
+# --- Deliverable 1 --git add README.md git commit -m "docs: Create comprehensive README with project setup and architecture"
+# --- Deliverable 2 --git add src/main/resources/application.properties git commit -m "chore: Add environment configuration properties for future database integration"
+# --- This brief --git add docs/Gabriel_Mwila_Role_Brief.pdf git commit -m "docs: Add role brief for Documentation & Configuration"
+git push -u origin docs/gabriel-readme-config
