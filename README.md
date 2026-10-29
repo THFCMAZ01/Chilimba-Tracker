@@ -9,7 +9,13 @@ A digital, object-oriented financial tracking system designed to manage traditio
 Server configuration
 
 # Chilimba Tracker Application Properties
-server.port=7070 app.env=production app.name=ChilimbaTrackerAPI # Database Configuration (Pending Migration from HashMaps) db.url=jdbc:postgresql://localhost:5432/chilimba_db db.username=admin db.password=placeholder_password db.driver=org.postgresql.Driver
+server.port=7070 
+app.env=production 
+app.name=ChilimbaTrackerAPI 
+# Database Configuration (Pending Migration from HashMaps) db.url=jdbc:postgresql://localhost:5432/chilimba_db 
+db.username=admin 
+db.password=placeholder_password 
+db.driver=org.postgresql.Driver
 
 Commit workflow
 
