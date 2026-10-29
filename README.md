@@ -1,7 +1,10 @@
  Project documentation
  
 # Chilimba Tracker System
-A digital, object-oriented financial tracking system designed to manage traditional Zambian rotating    savings and credit associations (Chilimbas). ## [rocket] Tech Stack *   **Backend:** Java 17, Javalin Framework, Maven *   **Frontend:** HTML5, CSS3, JavaScript (Vanilla) *   **Deployment:** Docker, Render Cloud ## [people] Development Team (ZUT Software Engineering) *   Joshua Mazaza - Tech Lead & Core Models *   Gabriel Mwila - Documentation & Config *   Martin - Database Architecture *   Kondwani - Business Logic & Services *   Innocent - API Controllers ## [gear] Local Setup 1. Clone the repository: `git clone https://github.com/THFCMAZ01/Chilimba-Tracker.git` 2. Navigate to the project folder: `cd chilimba-tracker` 3. Compile and Run: `mvn clean compile exec:java` 4. Access the UI at `http://localhost:7070`
+A digital, object-oriented financial tracking system designed to manage traditional Zambian rotating    savings and credit associations (Chilimbas).
+## [rocket] Tech Stack *   **Backend:** Java 17, Javalin Framework, Maven *   **Frontend:** HTML5, CSS3, JavaScript (Vanilla) *   **Deployment:** Docker, Render Cloud 
+## [people] Development Team (ZUT Software Engineering) *   Joshua Mazaza - Tech Lead & Core Models *   Gabriel Mwila - Documentation & Config *   Martin - Database Architecture *   Kondwani - Business Logic & Services *   Innocent - API Controllers
+## [gear] Local Setup 1. Clone the repository: `git clone https://github.com/THFCMAZ01/Chilimba-Tracker.git` 2. Navigate to the project folder: `cd chilimba-tracker` 3. Compile and Run: `mvn clean compile exec:java` 4. Access the UI at `http://localhost:7070`
 
 Server configuration
 
