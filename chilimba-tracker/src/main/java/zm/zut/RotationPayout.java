@@ -1,20 +1,31 @@
-// RotationPayout.java
 package zm.zut;
+
 import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class RotationPayout implements PayoutRule {
     @Override
     public User determineNextRecipient(List<User> members, List<Payout> pastPayouts) {
-        // Find the first member who has not received a payout yet
+        if (members == null || members.isEmpty()) {
+            return null;
+        }
+
+        Set<String> paidMemberIds = new HashSet<>();
+        if (pastPayouts != null) {
+            for (Payout payout : pastPayouts) {
+                paidMemberIds.add(payout.getMemberId());
+            }
+        }
+
+        // The supplied member list must preserve the group's agreed registration order.
         for (User member : members) {
-            boolean hasReceived = pastPayouts.stream()
-                .anyMatch(p -> p.getMemberId().equals(member.getId()));
-            
-            if (!hasReceived) {
+            if (!paidMemberIds.contains(member.getId())) {
                 return member;
             }
         }
-        // If everyone has been paid, start over with the first member
-        return members.isEmpty() ? null : members.get(0);
+
+        // Start a new rotation after every member has received one payout.
+        return members.get(0);
     }
 }
