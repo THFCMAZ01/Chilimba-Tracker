@@ -10,3 +10,8 @@
 .classpath
 .project
 .settings/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
