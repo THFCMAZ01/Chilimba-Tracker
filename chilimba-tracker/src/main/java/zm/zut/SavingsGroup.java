@@ -1,5 +1,7 @@
+
 package zm.zut;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -11,6 +13,7 @@ public class SavingsGroup {
     private final List<Contribution> contributions = new ArrayList<>();
     private final List<Payout> payouts = new ArrayList<>();
     private final PayoutRule payoutRule;
+
     // Contributions before this index have already been included in a payout.
     private int paidContributionCount = 0;
 
@@ -28,12 +31,16 @@ public class SavingsGroup {
         if (members == null || !members.containsKey(contribution.getMemberId())) {
             throw new IllegalArgumentException("Member ID does not exist.");
         }
-        if (!Double.isFinite(contribution.getAmount()) || contribution.getAmount() <= 0) {
-            throw new MissedContributionException("Contribution must be a positive, valid amount.");
+        if (contribution.getAmount() == null
+                || contribution.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new MissedContributionException(
+                "Contribution must be a positive, valid amount."
+            );
         }
         if (contribution.getDate() == null) {
             throw new IllegalArgumentException("Contribution date is required.");
         }
+
         contributions.add(contribution);
     }
 
@@ -46,16 +53,21 @@ public class SavingsGroup {
             throw new IllegalStateException("There are no members to receive a payout.");
         }
 
-        List<Contribution> currentCycle = contributions.subList(paidContributionCount, contributions.size());
+        List<Contribution> currentCycle =
+            contributions.subList(paidContributionCount, contributions.size());
+
         if (currentCycle.isEmpty()) {
-            throw new MissedContributionException("No contributions have been recorded for this payout cycle.");
+            throw new MissedContributionException(
+                "No contributions have been recorded for this payout cycle."
+            );
         }
 
         Set<String> contributingMemberIds = new HashSet<>();
-        double poolAmount = 0.0;
+        BigDecimal poolAmount = BigDecimal.ZERO;
+
         for (Contribution contribution : currentCycle) {
             contributingMemberIds.add(contribution.getMemberId());
-            poolAmount += contribution.getAmount();
+            poolAmount = poolAmount.add(contribution.getAmount());
         }
 
         if (!contributingMemberIds.containsAll(members.keySet())) {
@@ -63,19 +75,27 @@ public class SavingsGroup {
                 "Every registered member must contribute before a payout can be made."
             );
         }
-        if (!Double.isFinite(poolAmount) || poolAmount <= 0) {
+
+        if (poolAmount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalStateException("The current contribution pool is invalid.");
         }
 
         List<User> memberList = new ArrayList<>(members.values());
         User nextRecipient = payoutRule.determineNextRecipient(memberList, payouts);
+
         if (nextRecipient == null) {
             throw new IllegalStateException("No eligible recipient found.");
         }
 
-        Payout newPayout = new Payout(nextRecipient.getId(), poolAmount, LocalDate.now());
+        Payout newPayout = new Payout(
+            nextRecipient.getId(),
+            poolAmount,
+            LocalDate.now()
+        );
+
         payouts.add(newPayout);
         paidContributionCount = contributions.size();
+
         return newPayout;
     }
 
