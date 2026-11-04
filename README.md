@@ -1,26 +1,248 @@
- Project documentation
- 
-# Chilimba Tracker System
-A digital, object-oriented financial tracking system designed to manage traditional Zambian rotating    savings and credit associations (Chilimbas).
-## [rocket] Tech Stack *   **Backend:** Java 17, Javalin Framework, Maven *   **Frontend:** HTML5, CSS3, JavaScript (Vanilla) *   **Deployment:** Docker, Render Cloud 
-## [people] Development Team (ZUT Software Engineering) *   Joshua Mazaza - Tech Lead & Core Models *   Gabriel Mwila - Documentation & Config *   Martin - Database Architecture *   Kondwani - Business Logic & Services *   Innocent - API Controllers
-## [gear] Local Setup 1. Clone the repository: `git clone https://github.com/THFCMAZ01/Chilimba-Tracker.git` 2. Navigate to the project folder: `cd chilimba-tracker` 3. Compile and Run: `mvn clean compile exec:java` 4. Access the UI at `http://localhost:7070`
+# Chilimba Tracker
 
-Server configuration
+Chilimba Tracker is a digital financial tracking system designed to help manage traditional Zambian rotating savings and credit associations (Chilimbas).
 
-# Chilimba Tracker Application Properties
-server.port=7070 
-app.env=production 
-app.name=ChilimbaTrackerAPI 
-# Database Configuration (Pending Migration from HashMaps) db.url=jdbc:postgresql://localhost:5432/chilimba_db 
-db.username=admin 
-db.password=placeholder_password 
-db.driver=org.postgresql.Driver
+The application supports member registration, contribution recording, payout processing, and financial activity tracking.
 
-Commit workflow
+## Project Status
 
-git checkout main
-git pull origin main
-git checkout -b docs/gabriel-readme-config
+This project is currently being prepared for a group demonstration.
 
-APP_LINK: https://chilimba-tracker1.onrender.com/
+The core member, contribution, and payout workflows have been implemented and tested. Authentication and role-based access control are still planned improvements.
+
+**Important:** This version is for demonstration and testing only. Do not use real savings or expose the application publicly for handling real financial transactions. Financial endpoints do not yet require authentication.
+
+## Technology Stack
+
+- Backend: Java 17, Javalin 6
+- Frontend: HTML5, CSS3, JavaScript
+- Database: Neon PostgreSQL
+- Build tool: Maven Wrapper
+- Deployment: Docker and Render
+- Testing: JUnit 5
+
+## Development Team
+
+ZUT Software Engineering Team:
+
+- Joshua Mazaza - Tech Lead and Core Models
+- Gabriel Mwila - Documentation and Configuration
+- Martin - Database Architecture
+- Kondwani - Business Logic and Services
+- Innocent - API Controllers
+
+## Requirements
+
+Before running the application, install:
+
+1. Java Development Kit (JDK) 17 or later.
+2. Git.
+3. An internet connection for the initial Maven Wrapper and dependency downloads.
+
+You do not need to install Maven separately. The project includes the Maven Wrapper.
+
+You do not need to install PostgreSQL locally. The team uses one shared Neon PostgreSQL database.
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/THFCMAZ01/Chilimba-Tracker.git
+cd Chilimba-Tracker
+```
+
+### 2. Open the Maven project directory
+
+```bash
+cd chilimba-tracker
+```
+
+Run all subsequent application commands from this directory.
+
+### 3. Configure the database connection
+
+Each team member must create their own local `.env` file.
+
+**Windows PowerShell:**
+
+```powershell
+Copy-Item .env.example .env
+```
+
+**Windows Command Prompt:**
+
+```cmd
+copy .env.example .env
+```
+
+**Linux:**
+
+```bash
+cp .env.example .env
+```
+
+Open `.env` in a text editor and replace the placeholders with the database connection details provided privately by the project maintainer.
+
+The file must contain these three settings:
+
+```properties
+DB_URL=jdbc:postgresql://YOUR_HOSTNAME/neondb?sslmode=require
+DB_USERNAME=YOUR_DATABASE_USERNAME
+DB_PASSWORD=YOUR_DATABASE_PASSWORD
+```
+
+The team uses one shared Neon database. All members connect to the same database, so changes made by one member will be visible to everyone.
+
+**Security rules:**
+
+- Never commit or upload your `.env` file.
+- Never share database credentials in GitHub commits or public messages.
+- Do not replace the placeholders in `.env.example` with real credentials.
+- Keep the shared database credentials private.
+
+### 4. Run the automated tests
+
+Run from the `chilimba-tracker` directory.
+
+**Windows PowerShell or Command Prompt:**
+
+```powershell
+.\mvnw.cmd test
+```
+
+**Linux:**
+
+```bash
+./mvnw test
+```
+
+The first run may download Maven and project dependencies.
+
+### 5. Start the application
+
+**Windows PowerShell:**
+
+```powershell
+.\mvnw.cmd exec:java "-Dexec.mainClass=zm.zut.Main"
+```
+
+**Windows Command Prompt:**
+
+```cmd
+mvnw.cmd exec:java "-Dexec.mainClass=zm.zut.Main"
+```
+
+**Linux:**
+
+```bash
+./mvnw exec:java -Dexec.mainClass=zm.zut.Main
+```
+
+When the server starts, open the application in your browser:
+
+http://localhost:7070
+
+To stop the server, press `Ctrl + C` in the terminal running the application.
+
+## Shared Database Guidelines
+
+All team members connect to the same Neon PostgreSQL database.
+
+This means:
+
+- Members registered by one team member will appear for everyone.
+- Contributions recorded by one team member will be visible to everyone.
+- Payout operations affect the shared database.
+- Team members must coordinate before testing operations that modify financial records.
+
+Use clearly identifiable test records during development and demonstrations.
+
+Avoid executing payout operations repeatedly. A successful payout closes the current contribution cycle and creates another one.
+
+## Application Features
+
+- Member registration and management.
+- Contribution recording.
+- Contribution tracking for the current cycle.
+- Rotational payout processing.
+- Payout history.
+- Financial activity ledger.
+- Dashboard summaries.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/status` | Application and database status |
+| GET | `/members` | Retrieve members |
+| POST | `/members` | Register a member |
+| GET | `/contributions` | Retrieve current-cycle contributions |
+| POST | `/contributions` | Record a contribution |
+| GET | `/payouts` | Retrieve payout history |
+| POST | `/payouts` | Execute a payout |
+
+The application serves its frontend and API from the same server.
+
+## Project Structure
+
+```text
+Chilimba-Tracker/
+├── .gitignore
+├── .dockerignore
+├── README.md
+└── chilimba-tracker/
+    ├── .mvn/
+    │   └── wrapper/
+    ├── mvnw
+    ├── mvnw.cmd
+    ├── .env.example
+    ├── Dockerfile
+    ├── pom.xml
+    └── src/
+        ├── main/
+        │   ├── java/zm/zut/
+        │   └── resources/public/
+        └── test/
+            └── java/zm/zut/
+```
+
+## Deployment
+
+The application is configured for Docker deployment on Render.
+
+Demo application:
+
+https://chilimba-tracker1.onrender.com/
+
+The deployed service requires these environment variables to be configured in Render:
+
+- `DB_URL`
+- `DB_USERNAME`
+- `DB_PASSWORD`
+
+Use the authorized Neon database connection details. Never put their actual values in this README.
+
+Deployment and live database access should be coordinated by the project maintainer.
+
+## Current Limitations and Future Improvements
+
+The following improvements remain important:
+
+- User authentication and session management.
+- Treasurer-only permissions for financial operations.
+- Protection of payout execution.
+- Stronger authorization and financial transaction safeguards.
+- Additional integration and user-interface testing.
+- Improved production deployment and monitoring.
+
+Until authentication and authorization are implemented, the application should only be used with test data.
+
+## Team Collaboration
+
+1. Pull the latest changes before starting work.
+2. Create a separate Git branch for your task.
+3. Test changes locally before sharing them.
+4. Coordinate database testing with the rest of the team.
+5. Never commit environment files, credentials, or other secrets.
+6. Avoid making uncoordinated changes to shared financial records.
