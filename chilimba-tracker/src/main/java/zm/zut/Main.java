@@ -5,26 +5,14 @@ import io.javalin.json.JavalinJackson;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import zm.zut.controller.MemberController;
+import zm.zut.controller.ContributionController;
+import zm.zut.controller.PayoutController;
+
 import java.sql.SQLException;
-import java.time.LocalDate;
 import java.util.Map;
 
 public class Main {
-
-    private static final MemberRepository memberRepository =
-        new MemberRepository();
-
-    private static final ContributionRepository contributionRepository =
-        new ContributionRepository();
-
-    private static final PayoutRepository payoutRepository =
-        new PayoutRepository();
-
-    public static class NewUserRequest {
-        public String name;
-        public String phone;
-        public String role;
-    }
 
     public static void main(String[] args) throws SQLException {
 
@@ -81,73 +69,19 @@ public class Main {
             ))
         );
 
-        // Retrieve members from Neon.
-        app.get("/members", ctx ->
-            ctx.json(memberRepository.findAll())
-        );
+        // Create repository dependencies.
+        MemberRepository memberRepository = new MemberRepository();
+        ContributionRepository contributionRepository =
+            new ContributionRepository();
+        PayoutRepository payoutRepository = new PayoutRepository();
 
-        // Register a member in Neon.
-        app.post("/members", ctx -> {
+        // Register API controllers.
+        new MemberController(memberRepository).registerRoutes(app);
 
-            NewUserRequest req =
-                ctx.bodyAsClass(NewUserRequest.class);
+        new ContributionController(contributionRepository)
+            .registerRoutes(app);
 
-            if (req.name == null || req.name.isBlank()
-                    || req.phone == null || req.phone.isBlank()
-                    || req.role == null || req.role.isBlank()) {
-
-                throw new IllegalArgumentException(
-                    "Name, phone and role are required."
-                );
-            }
-
-            User newUser = memberRepository.registerMember(
-                req.name,
-                req.phone,
-                req.role
-            );
-
-            ctx.status(201).json(newUser);
-        });
-
-        // Retrieve current-cycle contributions from Neon.
-        app.get("/contributions", ctx ->
-            ctx.json(contributionRepository.findAllForCurrentCycle())
-        );
-
-        // Record a contribution in Neon.
-        app.post("/contributions", ctx -> {
-
-            Contribution payload =
-                ctx.bodyAsClass(Contribution.class);
-
-            LocalDate date = payload.getDate() != null
-                ? payload.getDate()
-                : LocalDate.now();
-
-            Contribution savedContribution =
-                contributionRepository.recordContribution(
-                    payload.getMemberId(),
-                    payload.getAmount(),
-                    date
-                );
-
-            ctx.status(201).json(savedContribution);
-        });
-
-        // Retrieve payout history from Neon.
-        app.get("/payouts", ctx ->
-            ctx.json(payoutRepository.findAll())
-        );
-
-        // Execute and persist a payout in Neon.
-        app.post("/payouts", ctx -> {
-
-            Payout payout =
-                payoutRepository.executePayout(LocalDate.now());
-
-            ctx.status(201).json(payout);
-        });
+        new PayoutController(payoutRepository).registerRoutes(app);
 
         int port = System.getenv("PORT") != null
             ? Integer.parseInt(System.getenv("PORT"))
