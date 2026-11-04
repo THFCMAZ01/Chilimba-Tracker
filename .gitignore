@@ -15,3 +15,9 @@
 .env
 .env.*
 !.env.example
+
+# Local database diagnostic programs - do not share
+local-diagnostics/
+
+# Backup files
+*.save

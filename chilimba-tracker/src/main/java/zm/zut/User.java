@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 public abstract class User {
     private String id;
+    private String memberCode;
     private String name;
     private String phone;
     private LocalDate joinDate;
@@ -16,14 +17,40 @@ public abstract class User {
     }
 
     // Encapsulation: Getters and Setters
-    public String getId() { return id; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
-    public LocalDate getJoinDate() { return joinDate; }
+    public String getId() {
+        return id;
+    }
 
-    // Polymorphism: Abstract methods to be implemented by subclasses
+    public String getMemberCode() {
+        return memberCode;
+    }
+
+    public void setMemberCode(String memberCode) {
+        this.memberCode = memberCode;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    public LocalDate getJoinDate() {
+        return joinDate;
+    }
+
+    // Polymorphism: Abstract methods implemented by subclasses
     public abstract String getRoleName();
+
     public abstract boolean canManageFunds();
 }

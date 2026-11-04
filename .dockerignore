@@ -1,0 +1,21 @@
+# Git history and repository metadata
+.git/
+.github/
+
+# IDE configuration
+.idea/
+.vscode/
+*.iml
+
+# Maven build output
+**/target/
+
+# Local environment files and secrets
+**/.env
+**/.env.*
+
+# Compiled Java files
+**/*.class
+
+# Backup files
+**/*.save
