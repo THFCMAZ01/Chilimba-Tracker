@@ -16,9 +16,6 @@ public class PayoutRepository {
         "2e2067d4-6ca4-4cef-ba6f-98f335d52df7"
     );
 
-    private static final String SYSTEM_USER_EMAIL =
-        "system@chilimba.local";
-
     private final PayoutRule payoutRule;
 
     public PayoutRepository() {
@@ -31,8 +28,15 @@ public class PayoutRepository {
      * The payout, cycle closure and next cycle creation
      * happen in one database transaction.
      */
-    public Payout executePayout(LocalDate payoutDate)
-            throws SQLException {
+    public Payout executePayout(
+            LocalDate payoutDate,
+            UUID recordedByUserId) throws SQLException {
+
+        if (recordedByUserId == null) {
+            throw new IllegalArgumentException(
+                "The authenticated recorder is required."
+            );
+        }
 
         LocalDate date = payoutDate == null
             ? LocalDate.now()
@@ -90,7 +94,8 @@ public class PayoutRepository {
                     cycleId,
                     recipient.getId(),
                     totalAmount,
-                    date
+                    date,
+                    recordedByUserId
                 );
 
                 // Mark the completed cycle as paid.
@@ -379,7 +384,8 @@ public class PayoutRepository {
             UUID cycleId,
             String recipientId,
             BigDecimal amount,
-            LocalDate date) throws SQLException {
+            LocalDate date,
+            UUID recordedByUserId) throws SQLException {
 
         String sql = """
             INSERT INTO payouts (
@@ -390,10 +396,7 @@ public class PayoutRepository {
                 payout_date,
                 recorded_by_user_id
             )
-            VALUES (
-                ?, ?, ?, ?, ?,
-                (SELECT id FROM users WHERE email = ?)
-            )
+            VALUES (?, ?, ?, ?, ?, ?)
             """;
 
         try (PreparedStatement statement =
@@ -404,7 +407,7 @@ public class PayoutRepository {
             statement.setObject(3, UUID.fromString(recipientId));
             statement.setBigDecimal(4, amount);
             statement.setObject(5, date);
-            statement.setString(6, SYSTEM_USER_EMAIL);
+            statement.setObject(6, recordedByUserId);
 
             int rows = statement.executeUpdate();
 

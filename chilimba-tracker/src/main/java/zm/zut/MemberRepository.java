@@ -28,18 +28,14 @@ public class MemberRepository {
             );
         }
 
-        String normalizedRole;
-
-        if ("Treasurer".equalsIgnoreCase(role)) {
-            normalizedRole = "TREASURER";
-        } else if ("OrdinaryMember".equalsIgnoreCase(role)
-                || "Ordinary Member".equalsIgnoreCase(role)) {
-            normalizedRole = "ORDINARY_MEMBER";
-        } else {
+        if (!"OrdinaryMember".equalsIgnoreCase(role)
+                && !"Ordinary Member".equalsIgnoreCase(role)) {
             throw new IllegalArgumentException(
-                "Role must be Treasurer or Ordinary Member."
+                "New members can only be registered as Ordinary Members."
             );
         }
+
+        String normalizedRole = "ORDINARY_MEMBER";
 
         try (Connection connection = Database.getConnection()) {
             connection.setAutoCommit(false);

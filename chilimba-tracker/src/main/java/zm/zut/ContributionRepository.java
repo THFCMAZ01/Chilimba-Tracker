@@ -16,9 +16,6 @@ public class ContributionRepository {
         "2e2067d4-6ca4-4cef-ba6f-98f335d52df7"
     );
 
-    private static final String SYSTEM_USER_EMAIL =
-        "system@chilimba.local";
-
     /**
      * Records a contribution in the current open cycle.
      *
@@ -27,7 +24,14 @@ public class ContributionRepository {
     public Contribution recordContribution(
             String memberId,
             BigDecimal amount,
-            LocalDate date) throws SQLException {
+            LocalDate date,
+            UUID recordedByUserId) throws SQLException {
+
+        if (recordedByUserId == null) {
+            throw new IllegalArgumentException(
+                "The authenticated recorder is required."
+            );
+        }
 
         if (memberId == null || memberId.isBlank()) {
             throw new IllegalArgumentException(
@@ -132,9 +136,7 @@ public class ContributionRepository {
                     }
                 }
 
-                // Insert the contribution.
-                // The system account acts as the temporary recorder
-                // until user authentication is implemented.
+                // Insert the contribution using the authenticated recorder.
                 String insertSql = """
                     INSERT INTO contributions (
                         group_id,
@@ -144,10 +146,7 @@ public class ContributionRepository {
                         contribution_date,
                         recorded_by_user_id
                     )
-                    VALUES (
-                        ?, ?, ?, ?, ?,
-                        (SELECT id FROM users WHERE email = ?)
-                    )
+                    VALUES (?, ?, ?, ?, ?, ?)
                     RETURNING member_id, amount, contribution_date
                     """;
 
@@ -161,13 +160,13 @@ public class ContributionRepository {
                     statement.setObject(3, memberUuid);
                     statement.setBigDecimal(4, amount);
                     statement.setObject(5, contributionDate);
-                    statement.setString(6, SYSTEM_USER_EMAIL);
+                    statement.setObject(6, recordedByUserId);
 
                     try (ResultSet result = statement.executeQuery()) {
                         if (!result.next()) {
                             throw new SQLException(
                                 "Contribution could not be saved. " +
-                                "Check that the system account exists."
+                                "Check that the authenticated user exists."
                             );
                         }
 

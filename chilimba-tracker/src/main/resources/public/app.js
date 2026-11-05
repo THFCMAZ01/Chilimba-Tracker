@@ -1,10 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-    initialiseNavigation();
-    initialiseForms();
-    initialisePayouts();
-    initialiseDate();
-
-    loadDashboard();
+    initialiseAuth();
 });
 
 // --------------------------------------------------
@@ -14,7 +9,10 @@ document.addEventListener("DOMContentLoaded", () => {
 const state = {
     members: [],
     contributions: [],
-    payouts: []
+    payouts: [],
+    csrfToken: null,
+    currentUser: null,
+    dashboardInitialised: false
 };
 
 const currencyFormatter = new Intl.NumberFormat("en-ZM", {
@@ -62,7 +60,26 @@ function getMemberCode(memberId) {
 // --------------------------------------------------
 
 async function apiRequest(url, options = {}) {
-    const response = await fetch(url, options);
+    const headers = { ...(options.headers || {}) };
+    const method = (options.method || "GET").toUpperCase();
+
+    // All authenticated POST requests require a CSRF token.
+    // Login is exempt because no authenticated session exists yet.
+    if (method === "POST" && state.csrfToken && url !== "/api/auth/login") {
+        headers["X-CSRF-Token"] = state.csrfToken;
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers,
+        credentials: "same-origin"
+    });
+
+    if (response.status === 401 && state.currentUser) {
+        const message = "Your session has expired. Please sign in again.";
+        showLoginScreen(message);
+        throw new Error(message);
+    }
 
     if (!response.ok) {
         let message = "Something went wrong.";
@@ -82,6 +99,122 @@ async function apiRequest(url, options = {}) {
     }
 
     return response.json();
+}
+
+// --------------------------------------------------
+// Authentication
+// --------------------------------------------------
+
+function showLoginScreen(message = "") {
+    document.getElementById("app-shell").hidden = true;
+    document.getElementById("login-screen").hidden = false;
+
+    const error = document.getElementById("login-error");
+    error.textContent = message;
+    error.hidden = !message;
+
+    state.csrfToken = null;
+    state.currentUser = null;
+}
+
+function showAuthenticatedApp(user) {
+    state.currentUser = user;
+    state.csrfToken = user.csrfToken;
+
+    document.getElementById("login-screen").hidden = true;
+    document.getElementById("app-shell").hidden = false;
+
+    document.getElementById("current-user").textContent =
+        `${user.name} (${user.role})`;
+
+    if (!state.dashboardInitialised) {
+        initialiseNavigation();
+        initialiseForms();
+        initialisePayouts();
+        initialiseDate();
+        state.dashboardInitialised = true;
+    }
+
+    loadDashboard();
+}
+
+async function fetchCurrentUser() {
+    return apiRequest("/api/auth/me");
+}
+
+async function initialiseAuth() {
+    const loginForm = document.getElementById("login-form");
+
+    loginForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        const email = document.getElementById("login-email").value.trim();
+        const passwordInput = document.getElementById("login-password");
+        const submitButton = document.getElementById("login-submit");
+        const error = document.getElementById("login-error");
+
+        error.hidden = true;
+        submitButton.disabled = true;
+        submitButton.textContent = "Signing in...";
+
+        try {
+            await apiRequest("/api/auth/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    email,
+                    password: passwordInput.value
+                })
+            });
+
+            passwordInput.value = "";
+
+            const user = await fetchCurrentUser();
+            showAuthenticatedApp(user);
+
+        } catch (err) {
+            passwordInput.value = "";
+            error.textContent = err.message;
+            error.hidden = false;
+
+        } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = "Sign in";
+        }
+    });
+
+    document.getElementById("logout-button").addEventListener(
+        "click",
+        async () => {
+            const button = document.getElementById("logout-button");
+            button.disabled = true;
+
+            try {
+                await apiRequest("/api/auth/logout", {
+                    method: "POST"
+                });
+
+                showLoginScreen("You have signed out.");
+                document.getElementById("login-password").value = "";
+
+            } catch (err) {
+                showNotification(err.message, true);
+
+            } finally {
+                button.disabled = false;
+            }
+        }
+    );
+
+    try {
+        const user = await fetchCurrentUser();
+        showAuthenticatedApp(user);
+
+    } catch (err) {
+        showLoginScreen();
+    }
 }
 
 async function loadDashboard() {
